@@ -132,9 +132,6 @@ class HBNBCommand(cmd.Cmd):
                     if (attribute[1].count('"') == 2):
                         if (attribute[1].count('_') > 0):
                             attribute[1] = attribute[1].replace('_', ' ')
-                        # self.do_update("{} {} {} {}".format(
-                        #     new_instance.__class__.__name__,
-                        #     new_instance.id, attribute[0], attribute[1]))
                         new_instance.__dict__.update({
                             attribute[0]: attribute[1].strip('"')})
                     elif (attribute[1].replace('.', '', 1).isdigit()
@@ -145,10 +142,6 @@ class HBNBCommand(cmd.Cmd):
                         else:
                             new_instance.__dict__.update({
                                 attribute[0]: float(attribute[1])})
-                        # self.do_update("{} {} {} {}".format(
-                        #     new_instance.__class__.__name__,
-                        #     new_instance.id, attribute[0], attribute[1]))
-                    # new_instance.__dict__.update({attribute[0]:attribute[1]})
         storage.new(new_instance)
         storage.save()
         print(new_instance.id)
