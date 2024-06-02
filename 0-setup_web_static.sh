@@ -1,27 +1,31 @@
 #!/usr/bin/env bash
-# script that sets up web servers for the deployment of web_static
-sudo apt-get update
-sudo apt-get -y install nginx
-sudo ufw allow 'Nginx HTTP'
+# sets up your web servers for the deployment of web_static
 
-sudo mkdir -p /data/
-sudo mkdir -p /data/web_static/
-sudo mkdir -p /data/web_static/releases/
-sudo mkdir -p /data/web_static/shared/
-sudo mkdir -p /data/web_static/releases/test/
-sudo touch /data/web_static/releases/test/index.html
-sudo echo "<html>
-  <head>
-  </head>
-  <body>
-    Holberton School
-  </body>
-</html>" | sudo tee /data/web_static/releases/test/index.html
+#install nginx web server 
+apt-get update
+apt-get install -y nginx
 
-sudo ln -s -f /data/web_static/releases/test/ /data/web_static/current
+mkdir -p /data/web_static/releases/
+mkdir -p /data/web_static/shared/
+mkdir -p /data/web_static/releases/test/
+echo "Release test" >> /data/web_static/releases/test/index.html
+# Create symlink, override if already exists
+ln -sfn /data/web_static/releases/test /data/web_static/current
+chown -R ubuntu:ubuntu /data/ 
 
-sudo chown -R ubuntu:ubuntu /data/
+# Add static location to nginx settings: 
 
-sudo sed -i '/listen 80 default_server/a location /hbnb_static { alias /data/web_static/current/;}' /etc/nginx/sites-enabled/default
+printf %s "server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        add_header X-Served-By $HOSTNAME;
+        root /var/www/html;
+        index index.html;
+        
+        location /hbnb_static {
+            alias /data/web_static/current;
+            index index.html index.htm;
+        }
+}" > /etc/nginx/sites-available/default
 
-sudo service nginx restart
+service nginx restart
